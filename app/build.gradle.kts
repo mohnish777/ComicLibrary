@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,13 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
 
+}
+
+val apikeyPropertiesFile = rootProject.file("apikey.properties")
+val apikeyProperties = Properties().apply {
+    apikeyPropertiesFile.inputStream().use { stream ->
+        load(stream)
+    }
 }
 
 android {
@@ -20,6 +29,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val apiKey = apikeyProperties.getProperty("MARVEL_KEY") ?: ""
+        val apiSecret = apikeyProperties.getProperty("MARVEL_SECRET") ?: ""
+        buildConfigField("String", "MARVEL_KEY", apiKey)
+        buildConfigField("String", "MARVEL_SECRET", apiSecret)
     }
 
     buildTypes {
@@ -27,6 +41,10 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
+
+        debug {
+        }
+
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -37,6 +55,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
