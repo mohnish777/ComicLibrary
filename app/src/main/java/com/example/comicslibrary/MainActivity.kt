@@ -4,14 +4,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.comicslibrary.ui.theme.ComicsLibraryTheme
+import com.example.comicslibrary.view.CharacterBottomNav
+import com.example.comicslibrary.view.CharacterDetailScreen
+import com.example.comicslibrary.view.CollectionScreen
+import com.example.comicslibrary.view.LibraryScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +23,36 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ComicsLibraryTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                CharacterScaffold()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ComicsLibraryTheme {
-        Greeting("Android")
+fun CharacterScaffold() {
+    val navController = rememberNavController()
+    Scaffold(
+        modifier = Modifier,
+        topBar = {},
+        bottomBar = {
+            CharacterBottomNav(navController)
+        }
+    ) { paddingValues ->
+        val topPadding = paddingValues.calculateTopPadding()
+        NavHost(
+            navController = navController,
+            startDestination = NavDestinationRoutes.Library.route
+        ) {
+            composable(NavDestinationRoutes.Library.route) {
+                LibraryScreen(modifier = Modifier.padding(paddingValues))
+            }
+            composable(NavDestinationRoutes.Collection.route) {
+                CollectionScreen()
+            }
+            composable(NavDestinationRoutes.CharacterDetail.route) {
+                CharacterDetailScreen()
+            }
+        }
     }
 }
