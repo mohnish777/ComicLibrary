@@ -32,8 +32,8 @@ android {
 
         val apiKey = apikeyProperties.getProperty("MARVEL_KEY") ?: ""
         val apiSecret = apikeyProperties.getProperty("MARVEL_SECRET") ?: ""
-        buildConfigField("String", "MARVEL_KEY", apiKey)
-        buildConfigField("String", "MARVEL_SECRET", apiSecret)
+        buildConfigField("String", "MARVEL_KEY", "\"$apiKey\"")
+        buildConfigField("String", "MARVEL_SECRET", "\"$apiSecret\"")
     }
 
     buildTypes {
@@ -84,6 +84,8 @@ dependencies {
     //retrofit
     implementation(libs.gson)
     implementation(libs.retrofit)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.converter.gson)
     // coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)

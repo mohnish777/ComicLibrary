@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.comicslibrary.ExampleApiCall
 
 @Composable
 fun LibraryScreen(modifier: Modifier) {
@@ -17,6 +18,8 @@ fun LibraryScreen(modifier: Modifier) {
         Text(
             modifier = Modifier.align(Alignment.Center),
             text = "This is Library Screen")
+        ExampleApiCall().fetchCharacters()
+
     }
 }
 
