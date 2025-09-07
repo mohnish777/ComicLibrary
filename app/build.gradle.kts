@@ -32,8 +32,8 @@ android {
 
         val apiKey = apikeyProperties.getProperty("MARVEL_KEY") ?: ""
         val apiSecret = apikeyProperties.getProperty("MARVEL_SECRET") ?: ""
-        buildConfigField("String", "MARVEL_KEY", "\"$apiKey\"")
-        buildConfigField("String", "MARVEL_SECRET", "\"$apiSecret\"")
+        buildConfigField("String", "MARVEL_KEY", apiKey)
+        buildConfigField("String", "MARVEL_SECRET", apiSecret)
     }
 
     buildTypes {
