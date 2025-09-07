@@ -34,8 +34,8 @@ object ApiService {
             .build()
     }
 
-    val api: MarvelApi by lazy {
-        getRetrofit().create(MarvelApi::class.java)
+    val api: RatedMovieAPI by lazy {
+        getRetrofit().create(RatedMovieAPI::class.java)
     }
 
 
