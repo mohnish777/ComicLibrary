@@ -16,7 +16,9 @@ import com.example.comicslibrary.view.CharacterBottomNav
 import com.example.comicslibrary.view.CharacterDetailScreen
 import com.example.comicslibrary.view.CollectionScreen
 import com.example.comicslibrary.view.LibraryScreen
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

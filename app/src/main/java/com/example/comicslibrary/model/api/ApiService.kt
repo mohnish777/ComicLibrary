@@ -1,31 +1,13 @@
 package com.example.comicslibrary.model.api
 
-import com.example.comicslibrary.BuildConfig
-import com.example.comicslibrary.generateHash
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiService {
 
-    private const val BASE_URL = "https://gateway.marvel.com/v1/public/"
+    private const val BASE_URL = "https://api.themoviedb.org/3/"
 
-    // Helper function to get authentication parameters
-    fun getAuthParams(): Map<String, String> {
-        val ts = (System.currentTimeMillis() / 1000).toString() // Use seconds instead of milliseconds
-        val apiSecret = BuildConfig.MARVEL_SECRET
-        val apiKey = BuildConfig.MARVEL_KEY
-        val hash = generateHash(
-            ts = ts,
-            privateKey = apiSecret,
-            publicKey = apiKey
-        )
-
-        return mapOf(
-            "apikey" to apiKey,
-            "ts" to ts,
-            "hash" to hash
-        )
-    }
+    // TMDB does not require query-string auth when using Bearer; keeping method for compatibility if needed
 
     private fun getRetrofit(): Retrofit {
         return Retrofit.Builder()
@@ -34,8 +16,8 @@ object ApiService {
             .build()
     }
 
-    val api: RatedMovieAPI by lazy {
-        getRetrofit().create(RatedMovieAPI::class.java)
+    val api: SearchMovieAPI by lazy {
+        getRetrofit().create(SearchMovieAPI::class.java)
     }
 
 

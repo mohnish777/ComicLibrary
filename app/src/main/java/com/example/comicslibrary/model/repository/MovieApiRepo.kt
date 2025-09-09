@@ -1,33 +1,36 @@
-package com.example.comicslibrary
+package com.example.comicslibrary.model.repository
 
+import com.example.comicslibrary.BuildConfig
 import com.example.comicslibrary.model.MovieDiscoverResponse
-import com.example.comicslibrary.model.api.ApiService
+import com.example.comicslibrary.model.api.NetworkResult
+import com.example.comicslibrary.model.api.SearchMovieAPI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-// Updated to match the new Retrofit structure (RatedMovieAPI)
-class ExampleApiCall {
+class MovieApiRepo(private val api: SearchMovieAPI) {
+    val movies = MutableStateFlow<NetworkResult<MovieDiscoverResponse>>(NetworkResult.Initial())
 
-    // Kept the method name so existing callers (e.g., LibraryScreen) continue to work
-    fun fetchCharacters() {
+    fun query(query: String) {
+        movies.value = NetworkResult.Loading()
         // NOTE: RatedMovieAPI expects an Authorization header (Bearer token)
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val authorization = "Bearer ${BuildConfig.MOVIE_ACCESS_TOKEN}"
-                val call = ApiService.api.searchMovies(
+                val call = api.searchMovies(
                     authorization = authorization,
                     language = "en-US",
                     query = "Harry Potter",
                     page = 1,
                     includeAdult = false,
                     region = null,
-                    year = null
+                    year = 2025
                 )
                 val response: Response<MovieDiscoverResponse> = call.execute()
                 if (response.isSuccessful) {
-                    val data = response.body()
+                    val data: MovieDiscoverResponse? = response.body()
                     data?.let { wrapper ->
                         println("Movies page: ${wrapper.page} / totalPages=${wrapper.totalPages} totalResults=${wrapper.totalResults}")
                         wrapper.results.forEach { movie ->
@@ -37,14 +40,19 @@ class ExampleApiCall {
                             println("---")
                         }
                     }
+                    movies.value = NetworkResult.Success(data = data as MovieDiscoverResponse)
+
+
+
                 } else {
                     println("Error: ${response.code()} - ${response.message()}")
                     println("Headers: ${response.headers()}")
+                    movies.value = NetworkResult.Error(response.message())
                 }
             } catch (t: Throwable) {
                 println("Network error: ${t.message}")
+                movies.value = NetworkResult.Error(message = t.message.toString())
             }
         }
     }
 }
-

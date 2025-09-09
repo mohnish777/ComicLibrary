@@ -30,10 +30,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val apiKey = apikeyProperties.getProperty("MARVEL_KEY") ?: ""
-        val apiSecret = apikeyProperties.getProperty("MARVEL_SECRET") ?: ""
-        buildConfigField("String", "MARVEL_KEY", apiKey)
-        buildConfigField("String", "MARVEL_SECRET", apiSecret)
+        val movieAccessToken = apikeyProperties.getProperty("MOVIE_ACCESS_TOKEN") ?: ""
+        val apiKey = apikeyProperties.getProperty("API_KEY") ?: ""
+        buildConfigField("String", "MOVIE_ACCESS_TOKEN", movieAccessToken)
+        buildConfigField("String", "API_KEY", apiKey)
     }
 
     buildTypes {
