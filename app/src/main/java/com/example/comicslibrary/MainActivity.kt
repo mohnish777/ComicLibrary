@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.padding
+import androidx.activity.viewModels
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,23 +16,25 @@ import com.example.comicslibrary.view.CharacterBottomNav
 import com.example.comicslibrary.view.CharacterDetailScreen
 import com.example.comicslibrary.view.CollectionScreen
 import com.example.comicslibrary.view.LibraryScreen
+import com.example.comicslibrary.viewmodel.LibraryApiViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val viewModel: LibraryApiViewModel by viewModels()
         enableEdgeToEdge()
         setContent {
             ComicsLibraryTheme {
-                CharacterScaffold()
+                CharacterScaffold(viewModel)
             }
         }
     }
 }
 
 @Composable
-fun CharacterScaffold() {
+fun CharacterScaffold(viewModel: LibraryApiViewModel) {
     val navController = rememberNavController()
     Scaffold(
         modifier = Modifier,
@@ -47,12 +49,17 @@ fun CharacterScaffold() {
             startDestination = NavDestinationRoutes.Library.route
         ) {
             composable(NavDestinationRoutes.Library.route) {
-                LibraryScreen(modifier = Modifier.padding(paddingValues))
+                LibraryScreen(
+                    navController = navController,
+                    vm = viewModel,
+                    modifier = Modifier,
+                    paddingValues = paddingValues)
+
             }
             composable(NavDestinationRoutes.Collection.route) {
                 CollectionScreen()
             }
-            composable(NavDestinationRoutes.CharacterDetail.route) {
+            composable(NavDestinationRoutes.MovieDetail.route) {
                 CharacterDetailScreen()
             }
         }

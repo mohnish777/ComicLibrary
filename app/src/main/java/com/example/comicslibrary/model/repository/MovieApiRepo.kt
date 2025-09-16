@@ -6,23 +6,34 @@ import com.example.comicslibrary.model.api.NetworkResult
 import com.example.comicslibrary.model.api.SearchMovieAPI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
 class MovieApiRepo(private val api: SearchMovieAPI) {
     val movies = MutableStateFlow<NetworkResult<MovieDiscoverResponse>>(NetworkResult.Initial())
+    private var currentSearchJob: Job? = null
+
+    fun clearResults() {
+        println("DEBUG - clearResults() called, setting to Initial state")
+        currentSearchJob?.cancel()
+        movies.value = NetworkResult.Initial()
+    }
 
     fun query(query: String) {
+        // Cancel any ongoing search
+        currentSearchJob?.cancel()
+
         movies.value = NetworkResult.Loading()
         // NOTE: RatedMovieAPI expects an Authorization header (Bearer token)
-        CoroutineScope(Dispatchers.IO).launch {
+        currentSearchJob = CoroutineScope(Dispatchers.IO).launch {
             try {
                 val authorization = "Bearer ${BuildConfig.MOVIE_ACCESS_TOKEN}"
                 val call = api.searchMovies(
                     authorization = authorization,
                     language = "en-US",
-                    query = "Harry Potter",
+                    query = query,
                     page = 1,
                     includeAdult = false,
                     region = null,
