@@ -16,6 +16,7 @@ import com.example.comicslibrary.view.CharacterBottomNav
 import com.example.comicslibrary.view.CharacterDetailScreen
 import com.example.comicslibrary.view.CollectionScreen
 import com.example.comicslibrary.view.LibraryScreen
+import com.example.comicslibrary.view.MovieDetailsScreen
 import com.example.comicslibrary.viewmodel.LibraryApiViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -61,6 +62,16 @@ fun CharacterScaffold(viewModel: LibraryApiViewModel) {
             }
             composable(NavDestinationRoutes.MovieDetail.route) {
                 CharacterDetailScreen()
+            }
+
+            composable("movieDetail/{movieId}") {
+                val movieId = it.arguments?.getString("movieId")?.toIntOrNull()
+                MovieDetailsScreen(
+                    lvm = viewModel,
+                    paddingValues = paddingValues,
+                    navController = navController,
+                    movieId = movieId
+                )
             }
         }
     }

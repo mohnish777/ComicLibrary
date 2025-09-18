@@ -17,6 +17,7 @@ class LibraryApiViewModel @Inject constructor(
     private val repo: MovieApiRepo
 ): ViewModel() {
     val movies = repo.movies
+    val movieDetailById = repo.movieDetailById
     val queryText = MutableStateFlow("")
     private val queryInput = Channel<String>(Channel.CONFLATED)
 
@@ -51,6 +52,10 @@ class LibraryApiViewModel @Inject constructor(
             queryText.value = query
             queryInput.trySend(query)
         }
+    }
+
+    fun retrieveMovieDetailById(id: Int?) {
+        repo.getMovieDetailById(id)
     }
 
 }

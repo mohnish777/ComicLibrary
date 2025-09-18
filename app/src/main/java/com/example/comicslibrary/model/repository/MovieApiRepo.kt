@@ -1,6 +1,9 @@
 package com.example.comicslibrary.model.repository
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.example.comicslibrary.BuildConfig
+import com.example.comicslibrary.model.Movie
 import com.example.comicslibrary.model.MovieDiscoverResponse
 import com.example.comicslibrary.model.api.NetworkResult
 import com.example.comicslibrary.model.api.SearchMovieAPI
@@ -13,6 +16,8 @@ import retrofit2.Response
 
 class MovieApiRepo(private val api: SearchMovieAPI) {
     val movies = MutableStateFlow<NetworkResult<MovieDiscoverResponse>>(NetworkResult.Initial())
+
+    val movieDetailById: MutableState<Movie?> = mutableStateOf(null)
     private var currentSearchJob: Job? = null
 
     fun clearResults() {
@@ -53,8 +58,6 @@ class MovieApiRepo(private val api: SearchMovieAPI) {
                     }
                     movies.value = NetworkResult.Success(data = data as MovieDiscoverResponse)
 
-
-
                 } else {
                     println("Error: ${response.code()} - ${response.message()}")
                     println("Headers: ${response.headers()}")
@@ -63,6 +66,14 @@ class MovieApiRepo(private val api: SearchMovieAPI) {
             } catch (t: Throwable) {
                 println("Network error: ${t.message}")
                 movies.value = NetworkResult.Error(message = t.message.toString())
+            }
+        }
+    }
+
+    fun getMovieDetailById(id: Int?) {
+        id?.let {
+            movieDetailById.value = movies.value.data?.results?.firstOrNull {
+                it.id == id
             }
         }
     }

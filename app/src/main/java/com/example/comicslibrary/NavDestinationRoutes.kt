@@ -17,3 +17,5 @@ sealed class NavDestinationRoutes(val route: String, @DrawableRes val iconRes: I
         )
     }
 }
+
+fun createMovieDetailRoute(movieId: Int) = "movieDetail/$movieId"

@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.comicslibrary.MovieImage
-import com.example.comicslibrary.NavDestinationRoutes
+import com.example.comicslibrary.createMovieDetailRoute
 import com.example.comicslibrary.model.Movie
 import com.example.comicslibrary.model.api.NetworkResult
 import com.example.comicslibrary.view.ImageUrlTemplate.toTMDBImageUrl
@@ -128,7 +128,7 @@ private fun ShowCharacterList(
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .clickable {
-                            navController?.navigate(NavDestinationRoutes.MovieDetail.createRoute(id))
+                            navController?.navigate(createMovieDetailRoute(id))
                         }
                 ) {
                     Row(modifier = Modifier.fillMaxWidth()) {
