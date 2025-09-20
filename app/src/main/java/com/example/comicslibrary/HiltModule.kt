@@ -24,7 +24,9 @@ class HiltModule {
 
     @Provides
     fun provideMovieDb(@ApplicationContext context: Context) =
-        Room.databaseBuilder(context, MovieDB::class.java, DB).build()
+        Room.databaseBuilder(context, MovieDB::class.java, DB)
+            .addMigrations(MovieDB.MIGRATION_1_2)
+            .build()
 
     @Provides
     fun provideMovieDao(movieDb: MovieDB) = movieDb.movieDao()

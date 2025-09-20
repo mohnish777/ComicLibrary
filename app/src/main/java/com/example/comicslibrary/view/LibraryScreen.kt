@@ -58,11 +58,11 @@ import com.example.comicslibrary.viewmodel.LibraryApiViewModel
 fun LibraryScreen(
     modifier: Modifier,
     navController: NavHostController? = null,
-    vm: LibraryApiViewModel,
+    lvm: LibraryApiViewModel,
     paddingValues: PaddingValues
 ) {
-    val result = vm.movies.collectAsState()
-    val text = vm.queryText.collectAsState()
+    val result = lvm.movies.collectAsState()
+    val text = lvm.queryText.collectAsState()
 
     Column(
         modifier = Modifier
@@ -106,7 +106,7 @@ fun LibraryScreen(
             // Enhanced Search Field
             OutlinedTextField(
                 value = text.value,
-                onValueChange = { vm.onQueryUpdate(it) },
+                onValueChange = { lvm.onQueryUpdate(it) },
                 label = { Text("Search movies") },
                 placeholder = { Text("Enter movie name...") },
                 leadingIcon = {
@@ -238,8 +238,7 @@ private fun MovieCard(
             // Movie Details
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .height(120.dp),
+                    .weight(1f),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {

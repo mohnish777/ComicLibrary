@@ -9,7 +9,7 @@ class MovieDbRepoImpl(private val movieDao: MovieDao): MovieDbRepoInterface {
         return movieDao.getAllMovies()
     }
 
-    override suspend fun getMovieById(id: Int): Flow<MovieEntity> {
+    override suspend fun getMovieById(id: Int): Flow<MovieEntity?> {
         return movieDao.getMovieById(id)
     }
 

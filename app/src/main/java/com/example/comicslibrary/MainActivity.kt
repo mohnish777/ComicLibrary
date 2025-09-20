@@ -17,6 +17,7 @@ import com.example.comicslibrary.view.CharacterDetailScreen
 import com.example.comicslibrary.view.CollectionScreen
 import com.example.comicslibrary.view.LibraryScreen
 import com.example.comicslibrary.view.MovieDetailsScreen
+import com.example.comicslibrary.viewmodel.CollectionViewModel
 import com.example.comicslibrary.viewmodel.LibraryApiViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,18 +25,22 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel: LibraryApiViewModel by viewModels()
+        val libraryViewModel: LibraryApiViewModel by viewModels()
+        val collectionViewModel: CollectionViewModel by viewModels()
         enableEdgeToEdge()
         setContent {
             ComicsLibraryTheme {
-                CharacterScaffold(viewModel)
+                CharacterScaffold(
+                    libraryViewModel = libraryViewModel,
+                    collectionViewModel = collectionViewModel
+                )
             }
         }
     }
 }
 
 @Composable
-fun CharacterScaffold(viewModel: LibraryApiViewModel) {
+fun CharacterScaffold(libraryViewModel: LibraryApiViewModel, collectionViewModel: CollectionViewModel) {
     val navController = rememberNavController()
     Scaffold(
         modifier = Modifier,
@@ -52,13 +57,17 @@ fun CharacterScaffold(viewModel: LibraryApiViewModel) {
             composable(NavDestinationRoutes.Library.route) {
                 LibraryScreen(
                     navController = navController,
-                    vm = viewModel,
+                    lvm = libraryViewModel,
                     modifier = Modifier,
                     paddingValues = paddingValues)
 
             }
             composable(NavDestinationRoutes.Collection.route) {
-                CollectionScreen()
+                CollectionScreen(
+                    cvm = collectionViewModel,
+                    paddingValues = paddingValues,
+                    navController = navController
+                )
             }
             composable(NavDestinationRoutes.MovieDetail.route) {
                 CharacterDetailScreen()
@@ -67,7 +76,8 @@ fun CharacterScaffold(viewModel: LibraryApiViewModel) {
             composable("movieDetail/{movieId}") {
                 val movieId = it.arguments?.getString("movieId")?.toIntOrNull()
                 MovieDetailsScreen(
-                    lvm = viewModel,
+                    lvm = libraryViewModel,
+                    cvm = collectionViewModel,
                     paddingValues = paddingValues,
                     navController = navController,
                     movieId = movieId

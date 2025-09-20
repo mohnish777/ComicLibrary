@@ -16,7 +16,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -24,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +43,7 @@ import androidx.navigation.NavHostController
 import com.example.comicslibrary.MovieImage
 import com.example.comicslibrary.model.Movie
 import com.example.comicslibrary.view.ImageUrlTemplate.toTMDBImageUrl
+import com.example.comicslibrary.viewmodel.CollectionViewModel
 import com.example.comicslibrary.viewmodel.LibraryApiViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -45,6 +51,7 @@ import java.util.Locale
 @Composable
 fun MovieDetailsScreen(
     lvm: LibraryApiViewModel,
+    cvm: CollectionViewModel,
     paddingValues: PaddingValues,
     navController: NavHostController? = null,
     movieId: Int?
@@ -55,12 +62,60 @@ fun MovieDetailsScreen(
     }
 
     val movieDetail: Movie? = lvm.movieDetailById.value
+    val collection = cvm.collection.collectAsState()
+    val inCollection = collection.value.any { it.id == movieId }
+
+    LaunchedEffect(Unit) {
+        cvm.setCurrentMovieEntityWithId(movieId ?: -1)
+    }
 
     if (movieDetail != null) {
-        MovieDetailContent(
-            movie = movieDetail,
-            paddingValues = paddingValues
-        )
+        val shouldAdd = !inCollection
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Main content with bottom padding for button
+            MovieDetailContent(
+                movie = movieDetail,
+                paddingValues = PaddingValues(
+                    top = paddingValues.calculateTopPadding(),
+                    start = paddingValues.calculateLeftPadding(androidx.compose.ui.unit.LayoutDirection.Ltr),
+                    end = paddingValues.calculateRightPadding(androidx.compose.ui.unit.LayoutDirection.Ltr),
+                    bottom = paddingValues.calculateBottomPadding() + 80.dp // Extra space for button
+                )
+            )
+
+            // Sticky "Add to Library" button
+            Button(
+                onClick = {
+                    if(shouldAdd) {
+                        cvm.addMovie(movieDetail)
+                    } else {
+                        cvm.delete(movieDetail)
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = paddingValues.calculateBottomPadding() + 16.dp
+                    )
+                    .height(56.dp)
+                    .align(Alignment.BottomCenter),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(
+                    imageVector = if (shouldAdd) Icons.Default.Add else Icons.Default.Delete,
+                    contentDescription = null,
+                )
+                Text(
+                    text = if (shouldAdd) "Add to My Collection" else "Remove from My Collection",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+        }
     } else {
         // Loading or error state
         Box(

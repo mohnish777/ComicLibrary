@@ -7,7 +7,7 @@ interface MovieDbRepoInterface {
 
     suspend fun getAllMovies(): Flow<List<MovieEntity>>
 
-    suspend fun getMovieById(id: Int): Flow<MovieEntity>
+    suspend fun getMovieById(id: Int): Flow<MovieEntity?>
 
     suspend fun insertMovie(movie: MovieEntity)
 
