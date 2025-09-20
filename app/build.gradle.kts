@@ -72,6 +72,7 @@ dependencies {
 
     //room dependencies
     implementation(libs.androidx.room.runtime)
+    implementation(libs.material3)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     // dagger-hilt
