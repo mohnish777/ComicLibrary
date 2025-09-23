@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -28,15 +29,19 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,8 +58,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.comicslibrary.MovieImage
+import com.example.comicslibrary.model.Note
 import com.example.comicslibrary.model.db.MovieEntity
 import com.example.comicslibrary.model.db.MovieEntity.Companion.toMovie
+import com.example.comicslibrary.model.db.NotesEntity
 import com.example.comicslibrary.viewmodel.CollectionViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -66,7 +73,8 @@ fun CollectionScreen(
     navController: NavHostController? = null
 ) {
     val collections = cvm.collection.collectAsState()
-    var expandOnlyOneCard by remember { mutableStateOf(-1) }
+    val notes = cvm.notes.collectAsState()
+    var expandOnlyOneCard by remember { mutableIntStateOf(-1) }
 
     Column(
         modifier = Modifier
@@ -102,9 +110,13 @@ fun CollectionScreen(
                     items = collections.value,
                     key = { movieEntity -> movieEntity.id }
                 ) { movieEntity ->
+
+                    val filteredNotes = notes.value.filter { it.movieId == movieEntity.id }
                     MovieCollectionCard(
                         movieEntity = movieEntity,
+                        notes = filteredNotes,
                         expandOnlyOneCard = expandOnlyOneCard,
+                        cvm = cvm,
                         onClickExpandOnlyOneCard = {
                             if (expandOnlyOneCard == movieEntity.id) {
                                 expandOnlyOneCard = -1
@@ -130,6 +142,8 @@ fun CollectionScreen(
 @Composable
 private fun MovieCollectionCard(
     movieEntity: MovieEntity,
+    notes: List<NotesEntity>,
+    cvm: CollectionViewModel,
     onDelete: () -> Unit,
     onClickExpandOnlyOneCard: () -> Unit,
     expandOnlyOneCard: Int
@@ -260,10 +274,210 @@ private fun MovieCollectionCard(
                 visible = expandOnlyOneCard == movieEntity.id || isExpanded,
                 enter = expandVertically() + fadeIn()
             ) {
-                ExpandedMovieContent(movieEntity = movieEntity)
+                NotesSection(movieEntity = movieEntity, notes = notes.filter { it.movieId == movieEntity.id }, cvm)
             }
         }
     }
+}
+
+
+@Composable
+private fun NotesSection(
+    movieEntity: MovieEntity,
+    notes: List<NotesEntity>,
+    cvm: CollectionViewModel
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(max = 500.dp) // Limit max height
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = "Notes (${notes.size})",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        if (notes.isEmpty()) {
+            Text(
+                text = "No notes for this movie yet",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        } else {
+            Spacer(modifier = Modifier.height(8.dp))
+            // Make notes scrollable within limited height
+            LazyColumn(
+                modifier = Modifier.heightIn(max = 200.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                items(notes) { note ->
+                    NoteItem(note = note, cvm = cvm)
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Make AddNote section scrollable
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 300.dp) // Limit height to leave room for keyboard
+        ) {
+            LazyColumn {
+                item {
+                    AddNote(movieId = movieEntity.id, cvm)
+                }
+            }
+        }
+
+    }
+}
+
+@Composable
+private fun NoteItem(
+    note: NotesEntity,
+    cvm: CollectionViewModel
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = note.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = note.text,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            IconButton(
+                onClick = { cvm.deleteNote(note.id) },
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete note",
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AddNote(movieId: Int, cvm: CollectionViewModel) {
+    var addNoteToElement by remember { mutableIntStateOf(-1) }
+    var noteTitle by remember { mutableStateOf("") }
+    var noteText by remember { mutableStateOf("") }
+    if (addNoteToElement == movieId) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+            ) {
+                Text(
+                    text = "Add Note",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                OutlinedTextField(
+                    value = noteTitle,
+                    onValueChange = { noteTitle = it },
+                    label = { Text("Title") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = noteText,
+                    onValueChange = { noteText = it },
+                    label = { Text("Note") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 80.dp, max = 120.dp),
+                    maxLines = 4
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            noteTitle = ""
+                            noteText = ""
+                            addNoteToElement = -1
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Cancel")
+                    }
+
+                    Button(
+                        onClick = {
+                            if (noteTitle.isNotBlank() && noteText.isNotBlank()) {
+                                cvm.addNote(NotesEntity.fromNotes(Note(movieId, noteTitle, noteText)))
+                                noteTitle = ""
+                                noteText = ""
+                                addNoteToElement = -1
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                        enabled = noteTitle.isNotBlank() && noteText.isNotBlank()
+                    ) {
+                        Text("Add")
+                    }
+                }
+            }
+        }
+    } else {
+        Button(
+            onClick = { addNoteToElement = movieId }
+        ) {
+            Text("Write Note")
+        }
+    }
+
 }
 
 @Composable

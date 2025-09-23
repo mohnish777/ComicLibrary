@@ -86,3 +86,6 @@ fun CharacterScaffold(libraryViewModel: LibraryApiViewModel, collectionViewModel
         }
     }
 }
+
+
+// https://www.perplexity.ai/search/i-need-to-find-the-class-so-th-86abOAmbQnivsk5hMKY1sg#18

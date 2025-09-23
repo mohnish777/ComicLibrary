@@ -6,15 +6,17 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 
-@Database(entities = [MovieEntity::class], version = 2, exportSchema = false)
+@Database(entities = [MovieEntity::class, NotesEntity::class], version = 2, exportSchema = false)
 abstract class MovieDB: RoomDatabase() {
     abstract fun movieDao(): MovieDao
 
+    abstract fun noteDao(): NoteDao
+
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
+            override fun migrate(db: SupportSQLiteDatabase) {
                 // Create new table with all columns
-                database.execSQL("""
+                db.execSQL("""
                     CREATE TABLE movie_table_new (
                         id INTEGER PRIMARY KEY NOT NULL,
                         title TEXT NOT NULL,
@@ -36,7 +38,7 @@ abstract class MovieDB: RoomDatabase() {
                 """.trimIndent())
 
                 // Copy existing data to new table with default values for new columns
-                database.execSQL("""
+                db.execSQL("""
                     INSERT INTO movie_table_new (
                         id, title, originalTitle, overview, posterPath, backdropPath,
                         releaseDate, originalLanguage, voteAverage, voteCount,
@@ -63,10 +65,10 @@ abstract class MovieDB: RoomDatabase() {
                 """.trimIndent())
 
                 // Drop old table
-                database.execSQL("DROP TABLE movie_table")
+                db.execSQL("DROP TABLE movie_table")
 
                 // Rename new table
-                database.execSQL("ALTER TABLE movie_table_new RENAME TO movie_table")
+                db.execSQL("ALTER TABLE movie_table_new RENAME TO movie_table")
             }
         }
     }
