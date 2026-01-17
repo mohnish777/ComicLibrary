@@ -18,11 +18,11 @@ val apikeyProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.example.comicslibrary"
+    namespace = "com.example.movielibrary"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.comicslibrary"
+        applicationId = "com.example.movielibrary"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
