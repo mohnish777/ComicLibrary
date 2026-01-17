@@ -4,6 +4,14 @@ A modern Android application built with **Jetpack Compose** that allows users to
 
 ---
 
+## 📸 Screenshots
+
+<div align="center">
+  <img src="screenshots/library_screen.png" alt="Library Screen - Movie Search" width="250"/>
+  <img src="screenshots/movie_details.png" alt="Movie Details Screen" width="250"/>
+  <img src="screenshots/collection_screen.png" alt="My Collection with Notes" width="250"/>
+</div>
+
 ## 📱 Features
 
 ### 🔍 Movie Search & Discovery
@@ -205,31 +213,6 @@ com.example.comicslibrary/
 
 ---
 
-## 📸 Screenshots
-
-<div align="center">
-  <img src="screenshots/library_screen.png" alt="Library Screen - Movie Search" width="250"/>
-  <img src="screenshots/movie_details.png" alt="Movie Details Screen" width="250"/>
-  <img src="screenshots/collection_screen.png" alt="My Collection with Notes" width="250"/>
-</div>
-
-### Library Screen
-- Real-time movie search with TMDB API
-- Animated movie cards with poster images
-- Search validation and debouncing
-
-### Movie Details Screen
-- Comprehensive movie information
-- Backdrop and poster images
-- Add/Remove from collection button
-
-### Collection Screen
-- Saved movies with expandable cards
-- Notes management system
-- Delete functionality
-
----
-
 ## 🔧 Setup Instructions
 
 1. **Clone the repository**
@@ -292,7 +275,7 @@ This project demonstrates:
 
 ## 👨‍💻 Developer
 
-**Shraddha Chittoory**
+**Mohnish Chittoory**
 
 This project showcases my skills in modern Android development, demonstrating proficiency in Kotlin, Jetpack Compose, MVVM architecture, dependency injection, API integration, database management, and creating polished user experiences.
 
