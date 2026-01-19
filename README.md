@@ -217,7 +217,7 @@ com.example.comicslibrary/
 
 1. **Clone the repository**
    ```bash
-   git clone repository-url>](https://github.com/mohnish777/MovieLibrary.git
+   git clone https://github.com/mohnish777/MovieLibrary.git
    ```
 
 2. **Get TMDB API Key**
